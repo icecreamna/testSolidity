@@ -23,7 +23,7 @@ contract RPS {
         players.push(msg.sender);
         numPlayer++;
     }
-
+//
     function input(uint choice) public  {
         require(numPlayer == 2);
         require(player_not_played[msg.sender]);
