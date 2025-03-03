@@ -56,7 +56,7 @@ contract RPS {
             // to pay player[0]
             account0.transfer(reward);    
         }
-        //
+        ////
         else {
             // to split reward
             account0.transfer(reward / 2);
