@@ -20,7 +20,7 @@ contract CommitReveal {
     emit CommitHash(msg.sender,commits[msg.sender].commit,commits[msg.sender].block);
   }
   event CommitHash(address sender, bytes32 dataHash, uint64 block);
-
+//
   function reveal(bytes32 revealHash) public {
     //make sure it hasn't been revealed yet and set it to revealed
     require(commits[msg.sender].revealed==false,"CommitReveal::reveal: Already revealed");
