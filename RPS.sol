@@ -42,7 +42,7 @@ contract RPS {
             _checkWinnerAndPay();
         }
     }
-
+//
     function _checkWinnerAndPay() private {
         uint p0Choice = player_choice[players[0]];
         uint p1Choice = player_choice[players[1]];

@@ -12,7 +12,7 @@ contract CommitReveal {
     bool revealed;
   }
   mapping (address => Commit) public commits;
-
+//
   function commit(bytes32 dataHash) public {
     commits[msg.sender].commit = dataHash;
     commits[msg.sender].block = uint64(block.number);
