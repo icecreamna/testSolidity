@@ -6,7 +6,7 @@ pragma solidity >=0.7.0 <0.9.0;
 contract RPS {
     uint public numPlayer = 0;
     uint public reward = 0;
-    mapping (address => uint) public player_choice; // 0 - Rock, 1 - Paper , 2 - Scissors
+    mapping (address => uint) public player_choice; // 0 - Rock, 1 - Paper , 2 - Scissors , 3 - Spock , 4 - Wizzard
     mapping(address => bool) public player_not_played;
     address[] public players;
 
@@ -56,6 +56,7 @@ contract RPS {
             // to pay player[0]
             account0.transfer(reward);    
         }
+        //
         else {
             // to split reward
             account0.transfer(reward / 2);
