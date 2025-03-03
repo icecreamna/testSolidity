@@ -13,14 +13,14 @@ contract TimeUnit {
   function setStartTime() public { 
     startTime = block.timestamp; 
   } 
-    
+    //
   // calculates numbers of seconds that  
   // have been elapsed since the startTime  
   // variable was set 
   function elapsedSeconds() public view returns (uint256) { 
     return (block.timestamp - startTime); 
   } 
-    
+    //
   // calculates numbers of minutes that have been  
   // elapsed since the startTime variable was set 
   function elapsedMinutes() public view returns (uint256) { 
