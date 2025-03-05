@@ -7,7 +7,7 @@ contract TimeUnit {
   // Declaring a  state variable that will  
   // store the current block timestamp 
   // as seconds since unix epoch(January 1, 1970) 
-  uint256 public startTime; 
+   uint256 public startTime; 
   
   // setting the startTime variable 
   function setStartTime() public { 
@@ -31,4 +31,8 @@ contract TimeUnit {
   
     return (block.timestamp - startTime) / 1 minutes; 
   } 
+
+  function resetStartTime() public {
+    startTime = 0 ;
+  }
 }
