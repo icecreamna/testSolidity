@@ -5,7 +5,6 @@ pragma solidity >=0.7.0 <0.9.0;
 import "./TimeUnit.sol";
 import "./CommitReveal.sol";
 
-
 contract RPS {
     uint256 public numPlayer = 0;
     uint256 public reward = 0;
@@ -46,24 +45,19 @@ contract RPS {
         players.push(msg.sender);
         numPlayer++;
         timeunit.setStartTime();
-        if(numPlayer == 2){
-            timeunit.setStartTime();
-        }
-        }
+    }
 
-
-    function Callback()payable public {
-        require(player_not_played[msg.sender] == false);
+    function Callback() public payable {
+        require(numPlayer == 1);
         require(timeunit.elapsedSeconds() > 3600);
-        if(timeunit.elapsedSeconds() > 3600){
-            payable(msg.sender).transfer(reward);
+        if (timeunit.elapsedSeconds() > 3600) {
+            payable(players[0]).transfer(reward);
         }
         numPlayer = 0;
         reward = 0;
         numInput = 0;
         delete players;
     }
-
 
     function input(uint256 choice) public {
         require(numPlayer == 2);
@@ -82,6 +76,19 @@ contract RPS {
         if (numInput == 2) {
             _checkWinnerAndPay();
         }
+    }
+
+    function forceGame() public payable {
+        require(numPlayer == 2);
+        require(player_not_played[msg.sender] == false);
+        require(timeunit.elapsedSeconds() > 7200);
+        if (timeunit.elapsedSeconds() > 7200) {
+            payable(msg.sender).transfer(reward);
+        }
+        numPlayer = 0;
+        reward = 0;
+        numInput = 0;
+        delete players;
     }
 
     //
