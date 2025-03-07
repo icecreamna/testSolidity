@@ -21,7 +21,8 @@ contract RPS {
         0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB
     ];
 
-    CommitReveal public commitReveal;
+    CommitReveal public commitReveal = new CommitReveal();
+    TimeUnit public timeunit = new TimeUnit();
 
     constructor() {
         commitReveal = new CommitReveal();
@@ -78,6 +79,32 @@ contract RPS {
 
     function getHash(uint256 choice, string memory salt) public view returns (bytes32) {
         return commitReveal.getHash(choice, salt);
+    }
+
+    
+    function forceGame() public payable {
+        require(numPlayer == 2);
+        require(player_not_played[msg.sender] == false);
+        require(timeunit.elapsedSeconds() > 7200);
+        if (timeunit.elapsedSeconds() > 7200) {
+            payable(msg.sender).transfer(reward);
+        }
+        numPlayer = 0;
+        reward = 0;
+        numInput = 0;
+        delete players;
+    }
+
+    function Callback() public payable {
+        require(numPlayer == 1);
+        require(timeunit.elapsedSeconds() > 3600);
+        if (timeunit.elapsedSeconds() > 3600) {
+            payable(players[0]).transfer(reward);
+        }
+        numPlayer = 0;
+        reward = 0;
+        numInput = 0;
+        delete players;
     }
 
     function _checkWinnerAndPay() private {
