@@ -1,3 +1,4 @@
+// RPS.sol
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.7.0 <0.9.0;
@@ -6,11 +7,8 @@ import "./TimeUnit.sol";
 import "./CommitReveal.sol";
 
 contract RPS {
-
-    TimeUnit public timeunit = new TimeUnit();
     uint256 public numPlayer = 0;
     uint256 public reward = 0;
-    mapping(address => bytes32) public commitments; // Store committed moves
     mapping(address => uint256) public player_choice;
     mapping(address => bool) public player_not_played;
     address[] public players;
@@ -22,6 +20,12 @@ contract RPS {
         0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db,
         0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB
     ];
+
+    CommitReveal public commitReveal;
+
+    constructor() {
+        commitReveal = new CommitReveal();
+    }
 
     modifier onlyPlayers() {
         require(msg.sender == players[0] || msg.sender == players[1], "Not a valid player");
@@ -48,16 +52,12 @@ contract RPS {
         numPlayer++;
     }
 
-    function commitMove(bytes32 _commitment) external onlyPlayers {
-        require(commitments[msg.sender] == bytes32(0), "Already committed");
-        commitments[msg.sender] = _commitment;
+    function commitMove(bytes32 _commitment, uint256 _choice, string memory _salt) external onlyPlayers {
+        commitReveal.commitMove(msg.sender, _commitment, _choice, _salt);
     }
 
-    function revealMove(uint256 choice, string memory salt) external onlyPlayers {
-        require(commitments[msg.sender] != bytes32(0), "No commitment found");
+    function revealMove(uint256 choice) external onlyPlayers {
         require(player_not_played[msg.sender], "Already revealed");
-        require(keccak256(abi.encode(choice, salt)) == commitments[msg.sender], "Invalid reveal");
-
         require(
             choice == 0 ||
                 choice == 1 ||
@@ -66,7 +66,7 @@ contract RPS {
                 choice == 4,
             "Invalid Choice"
         );
-
+        require(commitReveal.reveal(msg.sender), "Invalid reveal");
         player_choice[msg.sender] = choice;
         player_not_played[msg.sender] = false;
         numInput++;
@@ -76,8 +76,8 @@ contract RPS {
         }
     }
 
-    function getHash(uint256 choice, string memory salt) public pure returns (bytes32) {
-        return keccak256(abi.encode(choice, salt));
+    function getHash(uint256 choice, string memory salt) public view returns (bytes32) {
+        return commitReveal.getHash(choice, salt);
     }
 
     function _checkWinnerAndPay() private {
@@ -97,39 +97,13 @@ contract RPS {
         resetGame();
     }
 
-    function Callback() public payable {
-        require(numPlayer == 1);
-        require(timeunit.elapsedSeconds() > 3600);
-        if (timeunit.elapsedSeconds() > 3600) {
-            payable(players[0]).transfer(reward);
-        }
-        numPlayer = 0;
-        reward = 0;
-        numInput = 0;
-        delete players;
-    }
-
-    function forceGame() public payable {
-        require(numPlayer == 2);
-        require(player_not_played[msg.sender] == false);
-        require(timeunit.elapsedSeconds() > 7200);
-        if (timeunit.elapsedSeconds() > 7200) {
-            payable(msg.sender).transfer(reward);
-        }
-        numPlayer = 0;
-        reward = 0;
-        numInput = 0;
-        delete players;
-    }
-
-    function resetGame() internal {
-        delete commitments[players[0]];
-        delete commitments[players[1]];
+     function resetGame() internal {
         delete player_choice[players[0]];
         delete player_choice[players[1]];
         numPlayer = 0;
         reward = 0;
         numInput = 0;
+        commitReveal.resetCommit(players[0], players[1]); // เรียกใช้ resetCommit
         delete players;
     }
 }
